@@ -274,7 +274,7 @@ function Nav({ page, setPage }) {
         </button>
 
         {/* Mobile hamburger */}
-        <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "none" }} id="mob-btn">
+        <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }} id="mob-btn">
           {open ? <X size={22} color="var(--text-primary)" /> : <Menu size={22} color="var(--text-primary)" />}
         </button>
       </div>
@@ -308,6 +308,7 @@ function Nav({ page, setPage }) {
       {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.18)", zIndex: 40 }} />}
 
       <style>{`
+        #mob-btn{ display:none }
         @media(max-width:767px){
           nav > div > div:nth-child(2){ display:none !important }
           nav > div > button.lift{ display:none !important }
