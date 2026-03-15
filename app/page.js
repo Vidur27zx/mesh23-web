@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import {
-  ArrowRight, Sparkles, Mail, MapPin, Clock, Send,
+  ArrowRight, ExternalLink, Sparkles, Mail, MapPin, Clock, Send,
   Menu, X, Zap, Shield, FileText, MessageCircle,
   Settings, Cpu, ChevronDown
 } from "lucide-react";
@@ -61,7 +61,6 @@ const GlobalStyles = () => (
 
 /* ═══════════════════════════════════════════════════════════════════════════
    THREE.JS WIREFRAME BACKGROUND
-   — wireframe-only, brand stroke colors, increased opacity, mouse-reactive
 ═══════════════════════════════════════════════════════════════════════════ */
 function WireframeBG({ heroMode }) {
   const mountRef = useRef(null);
@@ -72,7 +71,6 @@ function WireframeBG({ heroMode }) {
     const el = mountRef.current;
     if (!el) return;
 
-    /* ── scene setup ── */
     const scene = new THREE.Scene();
     const W = el.clientWidth, H = el.clientHeight;
     const camera = new THREE.PerspectiveCamera(58, W / H, 0.1, 200);
@@ -86,7 +84,6 @@ function WireframeBG({ heroMode }) {
     const group = new THREE.Group();
     scene.add(group);
 
-    /* ── wireframe materials — warm peach palette, balanced visibility ── */
     const mat = (hex, opacity = 0.11) =>
       new THREE.MeshBasicMaterial({ color: hex, wireframe: true, transparent: true, opacity });
 
@@ -94,9 +91,8 @@ function WireframeBG({ heroMode }) {
     const blue   = mat(0xb8836a, 0.11);
     const pink   = mat(0xc49a8a, 0.10);
 
-    const meshes = []; // { mesh, rot: {x,y,z?}, float?: {amp,freq,off} }
+    const meshes = [];
 
-    /* helper: create + add */
     const add = (geo, material, pos, rot, rotSpeed, floatOpts) => {
       const m = new THREE.Mesh(geo, material);
       m.position.set(...pos);
@@ -105,21 +101,15 @@ function WireframeBG({ heroMode }) {
       meshes.push({ mesh: m, rot: rotSpeed || { x: 0, y: 0.004 }, float: floatOpts });
     };
 
-    /* ── LARGE wireframe shapes — MINIMAL, WIDELY SPACED for clean background ── */
-    // Just 4 main shapes, positioned far apart
     add(new THREE.IcosahedronGeometry(4.5, 1), green,
         [-9, 2, -5],  [0.3, 0.2, 0],   { x: 0.0018, y: 0.0035 });
-    
     add(new THREE.OctahedronGeometry(3.2, 1), blue,
         [10, -3, -6], [0.5, 0.4, 0.1], { x: 0.0025, y: -0.0028 });
-    
     add(new THREE.SphereGeometry(3.8, 16, 16), pink,
         [-8, -4, -7],  [0,0,0], { x: 0.001, y: 0.0025 });
-
     add(new THREE.DodecahedronGeometry(2.5, 0), green,
         [8, 4, -5.5], [0.6, 0.1, 0.3], { x: 0.0022, y: -0.003 });
 
-    /* ── small floating particles — FEWER, more subtle ── */
     const mats3 = [green, blue, pink];
     for (let i = 0; i < 12; i++) {
       const r = 0.08 + Math.random() * 0.18;
@@ -143,47 +133,37 @@ function WireframeBG({ heroMode }) {
       });
     }
 
-    /* ── faint grid floor ── */
     const grid = new THREE.GridHelper(32, 32, 0xa08878, 0xa08878);
     grid.material.transparent = true;
     grid.material.opacity = 0.045;
     grid.position.set(0, -6.5, -3);
     group.add(grid);
 
-    /* ── mouse ── */
     const onMouse = (e) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
     window.addEventListener("mousemove", onMouse);
 
-    /* ── animation loop ── */
     const clock = new THREE.Clock();
     const animate = () => {
       raf.current = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
-
       meshes.forEach(({ mesh, rot, float: fl }) => {
         if (rot.x) mesh.rotation.x += rot.x;
         if (rot.y) mesh.rotation.y += rot.y;
         if (rot.z) mesh.rotation.z += rot.z;
         if (fl) mesh.position.y += Math.sin(t * fl.freq + fl.off) * fl.amp;
       });
-
-      // smooth mouse follow
       group.rotation.y += (mouse.current.x * 0.18 - group.rotation.y) * 0.016;
       group.rotation.x += (mouse.current.y * 0.12 - group.rotation.x) * 0.016;
-
-      // subtle camera drift
       camera.position.x += (mouse.current.x * 1.6 - camera.position.x) * 0.01;
       camera.position.y += (mouse.current.y * 1.0 - camera.position.y) * 0.01;
       camera.lookAt(0, 0, 0);
-
       renderer.render(scene, camera);
     };
     animate();
 
-    /* ── resize ── */
     const onResize = () => {
       const nw = el.clientWidth, nh = el.clientHeight;
       camera.aspect = nw / nh;
@@ -202,7 +182,8 @@ function WireframeBG({ heroMode }) {
   }, []);
 
   return (
-    <div ref={mountRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none", filter: heroMode ? "blur(0.8px)" : "blur(1.1px)", opacity: heroMode ? 0.95 : 1 }} />
+    <div ref={mountRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none",
+                                  filter: heroMode ? "blur(0.8px)" : "blur(1.1px)", opacity: heroMode ? 0.95 : 1 }} />
   );
 }
 
@@ -245,7 +226,7 @@ function Nav({ page, setPage }) {
     <nav className="nav-glass" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: 64 }}>
       <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 24px", height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-        {/* Logo — TEXT-BASED */}
+        {/* Logo */}
         <button onClick={() => setPage("Home")} style={{ display: "flex", alignItems: "center", gap: 0, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
           <div style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <span className="syne" style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
@@ -336,7 +317,7 @@ function Hero({ setPage }) {
       <div style={{ position: "relative", zIndex: 20, height: "100%", display: "flex", flexDirection: "column",
                     alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px", paddingTop: 64 }}>
 
-        {/* pill badge — GLASS utility */}
+        {/* pill badge */}
         <div className="cta cta-pill glass" style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 40, padding: "6px 18px", marginBottom: 28, cursor: "default" }}>
           <Sparkles size={14} color="var(--primary)" />
           <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>AI Workflow Automation · Built for Small Teams</span>
@@ -358,21 +339,22 @@ function Hero({ setPage }) {
 
         {/* CTAs */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          {/* Primary — ENHANCED depth */}
+          {/* Primary */}
           <button onClick={() => setPage("Contact")} className="cta cta-primary"
             style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg,var(--grad))",
                      color: "#fff", border: "none", borderRadius: 10, padding: "12px 28px", fontSize: 15, fontWeight: 600, cursor: "pointer",
                      boxShadow: "0 12px 32px rgba(212,132,90,0.28), inset 0 1px 0 rgba(255,255,255,0.35)" }}>
             Discuss a Workflow <ArrowRight size={16} />
           </button>
-          {/* Secondary */}
-          <button onClick={() => { document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" }); }} className="cta cta-ghost"
-            style={{ background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border-light)",
-                     borderRadius: 10, padding: "12px 24px", fontSize: 15, fontWeight: 500, cursor: "pointer", transition: "color .2s" }}
+          {/* Secondary — Vision Labs */}
+          <a href="https://portfolio-vidur.vercel.app/#visionlabs" target="_blank" rel="noopener noreferrer" className="cta cta-ghost"
+            style={{ display: "flex", alignItems: "center", gap: 8, background: "transparent", color: "var(--text-muted)",
+                     border: "1px solid var(--border-light)", borderRadius: 10, padding: "12px 24px",
+                     fontSize: 15, fontWeight: 500, cursor: "pointer", transition: "color .2s", textDecoration: "none" }}
             onMouseEnter={e => e.currentTarget.style.color = "var(--text-secondary)"}
             onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
-            View examples
-          </button>
+            Vision Labs <ExternalLink size={15} />
+          </a>
         </div>
       </div>
 
@@ -428,109 +410,11 @@ function HowItWorks() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DEMO / CHAT
-═══════════════════════════════════════════════════════════════════════════ */
-function DemoSection() {
-  const capabilities = [
-    { name: "Project Status",        icon: FileText,      color: "var(--primary)" },
-    { name: "Follow-up Scheduling",  icon: Clock,         color: "var(--accent)" },
-    { name: "HR & Approvals",       icon: Shield,        color: "var(--secondary)" },
-  ];
-
-  const conversation = [
-    { from: "user",  text: "What's the current status of the Acme onboarding project?" },
-    { from: "bot",   text: "Two tasks are in review, one is blocked on legal sign-off. I've flagged it for the project lead.",
-      icon: FileText, color: "var(--primary-light)" },
-    { from: "user",  text: "Schedule a follow-up with the design team if no reply by end of day." },
-    { from: "bot",   text: "Done. A follow-up is scheduled for 5:00 PM today if no response is detected.",
-      icon: Clock, color: "var(--accent-light)" },
-    { from: "user",  text: "I need to submit a leave request for next Friday." },
-    { from: "bot",   text: "Leave request submitted for Fri 13 Jun. Awaiting manager approval — you'll be notified once it's actioned.",
-      icon: Shield, color: "var(--secondary-light)" },
-  ];
-
-  return (
-    <section style={{ padding: "104px 24px", background: "var(--surface-alt)" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <Reveal>
-          <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2.2, color: "var(--primary)" }}>In Practice</span>
-            <h2 className="syne" style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 600, color: "var(--text-primary)", marginTop: 10, marginBottom: 10 }}>
-              One conversation. Multiple actions.
-            </h2>
-            <p style={{ fontSize: 15, color: "var(--text-secondary)", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>
-              Workflows and AI working together inside a single interface.
-            </p>
-          </div>
-        </Reveal>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 28, alignItems: "start" }} id="demo-grid">
-
-          <Reveal>
-            <div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text-primary)", marginBottom: 6 }}>Integrated Intelligence</h3>
-              <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20, lineHeight: 1.6 }}>
-                mesh23 connects to your tools and acts on your behalf — not just answers.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {capabilities.map(({ name, icon: Icon, color }) => (
-                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--surface)",
-                                           border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
-                    <Icon size={18} color={color} />
-                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text-secondary)" }}>{name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={110}>
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, boxShadow: "var(--shadow-md)", overflow: "hidden" }}>
-              <div style={{ background: "var(--surface-alt)", borderBottom: "1px solid var(--border)", padding: "11px 18px", display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#ef4444" }} />
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#f59e0b" }} />
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#6aaa7a" }} />
-                <span style={{ marginLeft: 14, fontSize: 12, fontWeight: 500, color: "var(--text-muted)" }}>mesh23 · Workflow Assistant</span>
-              </div>
-              <div style={{ padding: "22px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
-                {conversation.map((msg, i) => {
-                  const Icon = msg.icon;
-                  return (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, justifyContent: msg.from === "user" ? "flex-end" : "flex-start" }}>
-                      {msg.from === "bot" && (
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: msg.color,
-                                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Icon size={14} color="var(--text-primary)" />
-                        </div>
-                      )}
-                      <div style={{
-                        background: msg.from === "bot" ? "var(--surface-alt)" : "var(--accent)",
-                        color: msg.from === "bot" ? "var(--text-primary)" : "#fff",
-                        border: msg.from === "bot" ? "1px solid var(--border)" : "none",
-                        borderRadius: 10, padding: "10px 14px", maxWidth: "78%", fontSize: 13, lineHeight: 1.55,
-                        boxShadow: "var(--shadow-sm)"
-                      }}>
-                        {msg.text}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-      <style>{`@media(max-width:680px){#demo-grid{grid-template-columns:1fr!important}}`}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    FEATURES GRID
 ═══════════════════════════════════════════════════════════════════════════ */
 function FeaturesGrid() {
   const features = [
-    { icon: Zap,           title: "Workflow Automation",        problem: "Repetitive manual tasks drain time and invite errors.",          how: "n8n + custom triggers and API chains.",              outcome: "Hours saved weekly, fewer mistakes." ,         color: "var(--primary)",   bg: "var(--primary-light)" },
+    { icon: Zap,           title: "Workflow Automation",        problem: "Repetitive manual tasks drain time and invite errors.",          how: "n8n + custom triggers and API chains.",              outcome: "Hours saved weekly, fewer mistakes.",          color: "var(--primary)",   bg: "var(--primary-light)" },
     { icon: MessageCircle, title: "Conversational Interfaces",  problem: "Teams need quick answers without opening five apps.",           how: "WhatsApp & Telegram bots powered by LLMs.",         outcome: "Answers where your team already works.",       color: "var(--accent)",    bg: "var(--accent-light)" },
     { icon: Cpu,           title: "AI-Augmented Logic",         problem: "Some decisions need context that hard rules can't capture.",   how: "LLM calls wired into workflow decision nodes.",     outcome: "Intelligence without full ML overhead.",       color: "var(--secondary)", bg: "var(--secondary-light)" },
     { icon: Settings,      title: "Custom Integrations",        problem: "Off-the-shelf connectors rarely fit unique setups.",           how: "Hand-built API bridges for your stack.",            outcome: "Your tools finally talk to each other.",       color: "var(--primary)",   bg: "var(--primary-light)" },
@@ -571,6 +455,95 @@ function FeaturesGrid() {
           })}
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DEMO / CHAT
+═══════════════════════════════════════════════════════════════════════════ */
+function DemoSection() {
+  const capabilities = [
+    { name: "Project Status",        icon: FileText,      color: "var(--primary)" },
+    { name: "Follow-up Scheduling",  icon: Clock,         color: "var(--accent)" },
+    { name: "HR & Approvals",        icon: Shield,        color: "var(--secondary)" },
+  ];
+
+  const conversation = [
+    { from: "user",  text: "What's the current status of the Acme onboarding project?" },
+    { from: "bot",   text: "Two tasks are in review, one is blocked on legal sign-off. I've flagged it for the project lead.",
+      icon: FileText, color: "var(--primary-light)" },
+    { from: "user",  text: "Schedule a follow-up with the design team if no reply by end of day." },
+    { from: "bot",   text: "Done. A follow-up is scheduled for 5:00 PM today if no response is detected.",
+      icon: Clock, color: "var(--accent-light)" },
+  ];
+
+  return (
+    <section style={{ padding: "104px 24px", background: "var(--surface-alt)" }}>
+      <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2.2, color: "var(--primary)" }}>Live Demo</span>
+            <h2 className="syne" style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 600, color: "var(--text-primary)", marginTop: 10, marginBottom: 10 }}>
+              See it in action
+            </h2>
+            <p style={{ fontSize: 15, color: "var(--text-secondary)", maxWidth: 460, margin: "0 auto", lineHeight: 1.6 }}>
+              A glimpse of how conversational automation handles real operational queries.
+            </p>
+          </div>
+        </Reveal>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 24, alignItems: "start" }} id="demo-grid">
+          <Reveal>
+            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px" }}>
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 16 }}>Capabilities</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {capabilities.map(({ name, icon: Icon, color }) => (
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
+                                           background: "var(--surface-alt)", borderRadius: 10, border: "1px solid var(--border)" }}>
+                    <Icon size={16} color={color} />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--primary)" }} />
+                <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>Workflow Assistant</span>
+              </div>
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
+                {conversation.map((msg, i) => {
+                  const Icon = msg.icon;
+                  return (
+                    <div key={i} style={{ display: "flex", gap: 10, justifyContent: msg.from === "user" ? "flex-end" : "flex-start" }}>
+                      {msg.from === "bot" && (
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: msg.color,
+                                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Icon size={14} color="var(--text-primary)" />
+                        </div>
+                      )}
+                      <div style={{
+                        background: msg.from === "bot" ? "var(--surface-alt)" : "var(--accent)",
+                        color: msg.from === "bot" ? "var(--text-primary)" : "#fff",
+                        border: msg.from === "bot" ? "1px solid var(--border)" : "none",
+                        borderRadius: 10, padding: "10px 14px", maxWidth: "78%", fontSize: 13, lineHeight: 1.55,
+                        boxShadow: "var(--shadow-sm)"
+                      }}>
+                        {msg.text}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+      <style>{`@media(max-width:680px){#demo-grid{grid-template-columns:1fr!important}}`}</style>
     </section>
   );
 }
@@ -633,45 +606,11 @@ function About() {
           </div>
         </Reveal>
 
-        <Reveal>
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "38px 42px", marginBottom: 32 }}>
-            <h2 className="syne" style={{ fontSize: 18, fontWeight: 600, color: "var(--text-primary)", marginBottom: 16 }}>Why this exists</h2>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 14 }}>
-              Most small teams know automation could save them hours every week. But the tools are fragmented,
-              the setup is opaque, and the "solutions" assume a budget and a DevOps team you don't have.
-            </p>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 14 }}>
-              mesh23 started from a simple frustration: watching talented people spend their mornings on tasks
-              a workflow could handle. The answer wasn't another SaaS dashboard — it was someone who could sit
-              down, understand the actual work, and build something that fits.
-            </p>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.8 }}>
-              Every project starts with understanding before building. Every automation is tested with real usage before it's called done.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 16, marginBottom: 32 }}>
-            {[
-              { title: "Learning by Building", desc: "Every workflow is a chance to get better. We ship, test, and iterate — not pitch theory." },
-              { title: "Practical Outcomes",   desc: "Success is measured in hours saved and errors avoided. Not dashboards." },
-              { title: "Honest Scope",         desc: "We'll tell you what automation can and can't do for your team. No overselling." },
-            ].map((item) => (
-              <div key={item.title} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "22px 20px" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", marginBottom: 7 }}>{item.title}</h3>
-                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div style={{ background: "var(--surface-alt)", border: "1px solid var(--border)", borderRadius: 18, padding: "38px 42px" }}>
-            <h2 className="syne" style={{ fontSize: 18, fontWeight: 600, color: "var(--text-primary)", textAlign: "center", marginBottom: 28 }}>What guides the work</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 24 }}>
+        <Reveal delay={80}>
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "40px 44px", marginBottom: 28 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
               {[
-                { icon: Shield,   title: "People First",        desc: "AI should reduce friction, not create it. Every build is evaluated by whether it makes the team's day easier." },
+                { icon: Zap,      title: "Outcomes First",    desc: "Every build is evaluated by whether it makes the team's day easier." },
                 { icon: Settings, title: "Privacy by Default",  desc: "Data handling is designed before the first line of code. Your information stays yours." },
                 { icon: Cpu,      title: "Build, Don't Hype",   desc: "No buzzwords. If it works, it works. If it doesn't, we rebuild it until it does." },
               ].map(({ icon: Icon, title, desc }) => (
@@ -701,16 +640,13 @@ function Contact() {
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const onSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
       if (!res.ok) throw new Error("Failed");
-
       setSent(true);
       setForm({ name: "", email: "", message: "" });
       setTimeout(() => setSent(false), 6500);
