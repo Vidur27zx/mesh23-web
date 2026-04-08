@@ -598,10 +598,10 @@ function Platform() {
 function About() {
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh", paddingTop: 64 }}>
-      <div style={{ maxWidth: 840, margin: "0 auto", padding: "80px 24px 100px" }}>
+      <div id="about-container" style={{ maxWidth: 840, margin: "0 auto", padding: "80px 24px 100px" }}>
 
         <Reveal>
-          <div style={{ textAlign: "center", marginBottom: 72 }}>
+          <div id="about-hero" style={{ textAlign: "center", marginBottom: 72 }}>
             <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2.2, color: "var(--primary)" }}>About</span>
             <h1 className="syne" style={{ fontSize: "clamp(2rem, 5vw, 2.9rem)", fontWeight: 600, color: "var(--text-primary)", marginTop: 10, lineHeight: 1.22 }}>
               An independent practice,<br /><span className="grad-text">built on real projects.</span>
@@ -614,8 +614,8 @@ function About() {
         </Reveal>
 
         <Reveal delay={80}>
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "40px 44px", marginBottom: 28 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
+          <div id="about-card" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "40px 44px", marginBottom: 28 }}>
+            <div id="about-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
               {[
                 { icon: Zap,      title: "Outcomes First",    desc: "Every build is evaluated by whether it makes the team's day easier." },
                 { icon: Settings, title: "Privacy by Default",  desc: "Data handling is designed before the first line of code. Your information stays yours." },
@@ -633,6 +633,19 @@ function About() {
           </div>
         </Reveal>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          #about-container { padding: 48px 20px 60px !important; }
+          #about-hero { marginBottom: 40px !important; }
+          #about-hero h1 { font-size: 2.2rem !important; }
+          #about-hero p { font-size: 15px !important; margin-top: 12px !important; }
+          #about-card { padding: 32px 24px !important; }
+          #about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          #about-grid p { font-size: 14px !important; }
+          #about-grid h3 { font-size: 16px !important; }
+        }
+      `}</style>
     </div>
   );
 }
