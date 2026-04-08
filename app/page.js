@@ -223,7 +223,8 @@ function Nav({ page, setPage }) {
   ];
 
   return (
-    <nav className="nav-glass" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: 64 }}>
+    <>
+      <nav className="nav-glass" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: 64 }}>
       <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 24px", height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
         {/* Logo */}
@@ -259,36 +260,38 @@ function Nav({ page, setPage }) {
           {open ? <X size={22} color="var(--text-primary)" /> : <Menu size={22} color="var(--text-primary)" />}
         </button>
       </div>
+    </nav>
 
       {/* Mobile drawer strictly conditionally rendered */}
       {open && (
         <>
           <div className="drawer"
-            style={{ position: "fixed", top: 0, right: 0, height: "100%", width: 256, background: "var(--surface)",
-                     borderLeft: "1px solid var(--border)", boxShadow: "var(--shadow-md)", zIndex: 60, padding: 24 }}>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
-              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-                <X size={24} color="var(--text-secondary)" />
+            style={{ position: "fixed", top: 0, right: 0, height: "100dvh", width: 280, background: "var(--surface)",
+                     borderLeft: "1px solid var(--border)", boxShadow: "var(--shadow-md)", zIndex: 100, padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+                <X size={28} color="var(--text-secondary)" />
               </button>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {links.map(({ label, target }) => (
                 <button key={target} onClick={() => { setPage(target); setOpen(false); }}
-                  style={{ background: page === target ? "var(--primary-light)" : "none", border: "none", borderRadius: 8,
-                           padding: "11px 14px", textAlign: "left", fontSize: 16, fontWeight: 500,
-                           color: page === target ? "var(--primary)" : "var(--text-primary)", cursor: "pointer" }}>
+                  style={{ background: page === target ? "var(--primary-light)" : "none", border: "none", borderRadius: 12,
+                           padding: "14px 18px", textAlign: "left", fontSize: 18, fontWeight: 500,
+                           color: page === target ? "var(--primary)" : "var(--text-primary)", cursor: "pointer",
+                           transition: "background 0.2s" }}>
                   {label}
                 </button>
               ))}
               <button onClick={() => { setPage("Contact"); setOpen(false); }} className="cta cta-primary"
-                style={{ marginTop: 16, background: "linear-gradient(135deg,var(--grad))", color: "#fff", border: "none",
-                         borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                style={{ marginTop: 24, background: "linear-gradient(135deg,var(--grad))", color: "#fff", border: "none",
+                         borderRadius: 12, padding: "14px 24px", fontSize: 16, fontWeight: 600, cursor: "pointer",
                          boxShadow: "0 12px 32px rgba(212,132,90,0.28), inset 0 1px 0 rgba(255,255,255,0.35)" }}>
                 Get in Touch
               </button>
             </div>
           </div>
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.18)", zIndex: 55, backdropFilter: "blur(2px)" }} />
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 90, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }} />
         </>
       )}
 
@@ -300,7 +303,7 @@ function Nav({ page, setPage }) {
           #mob-btn{ display:flex !important }
         }
       `}</style>
-    </nav>
+    </>
   );
 }
 
