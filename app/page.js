@@ -49,8 +49,8 @@ const GlobalStyles = () => (
     .cta:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
     .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
     .reveal.vis{opacity:1;transform:translateY(0)}
-    .drawer{transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-    .drawer.open{transform:translateX(0)}
+    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .drawer{animation: slideInRight .3s cubic-bezier(.4,0,.2,1)}
     input,textarea{font-family:inherit;outline:none}
     input:focus,textarea:focus{box-shadow:0 0 0 3px var(--primary-light)!important}
     ::-webkit-scrollbar{width:4px}
@@ -260,33 +260,37 @@ function Nav({ page, setPage }) {
         </button>
       </div>
 
-      {/* Mobile drawer */}
-      <div className={`drawer ${open ? "open" : ""}`}
-        style={{ position: "fixed", top: 0, right: 0, height: "100%", width: 256, background: "var(--surface)",
-                 borderLeft: "1px solid var(--border)", boxShadow: "var(--shadow-md)", zIndex: 51, padding: 24 }}>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
-          <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer" }}>
-            <X size={20} color="var(--text-secondary)" />
-          </button>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {links.map(({ label, target }) => (
-            <button key={target} onClick={() => { setPage(target); setOpen(false); }}
-              style={{ background: page === target ? "var(--primary-light)" : "none", border: "none", borderRadius: 8,
-                       padding: "11px 14px", textAlign: "left", fontSize: 15, fontWeight: 500,
-                       color: page === target ? "var(--primary)" : "var(--text-primary)", cursor: "pointer" }}>
-              {label}
-            </button>
-          ))}
-          <button onClick={() => { setPage("Contact"); setOpen(false); }} className="cta cta-primary"
-            style={{ marginTop: 16, background: "linear-gradient(135deg,var(--grad))", color: "#fff", border: "none",
-                     borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                     boxShadow: "0 12px 32px rgba(212,132,90,0.28), inset 0 1px 0 rgba(255,255,255,0.35)" }}>
-            Get in Touch
-          </button>
-        </div>
-      </div>
-      {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.18)", zIndex: 40 }} />}
+      {/* Mobile drawer strictly conditionally rendered */}
+      {open && (
+        <>
+          <div className="drawer"
+            style={{ position: "fixed", top: 0, right: 0, height: "100%", width: 256, background: "var(--surface)",
+                     borderLeft: "1px solid var(--border)", boxShadow: "var(--shadow-md)", zIndex: 60, padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+                <X size={24} color="var(--text-secondary)" />
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {links.map(({ label, target }) => (
+                <button key={target} onClick={() => { setPage(target); setOpen(false); }}
+                  style={{ background: page === target ? "var(--primary-light)" : "none", border: "none", borderRadius: 8,
+                           padding: "11px 14px", textAlign: "left", fontSize: 16, fontWeight: 500,
+                           color: page === target ? "var(--primary)" : "var(--text-primary)", cursor: "pointer" }}>
+                  {label}
+                </button>
+              ))}
+              <button onClick={() => { setPage("Contact"); setOpen(false); }} className="cta cta-primary"
+                style={{ marginTop: 16, background: "linear-gradient(135deg,var(--grad))", color: "#fff", border: "none",
+                         borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                         boxShadow: "0 12px 32px rgba(212,132,90,0.28), inset 0 1px 0 rgba(255,255,255,0.35)" }}>
+                Get in Touch
+              </button>
+            </div>
+          </div>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.18)", zIndex: 55, backdropFilter: "blur(2px)" }} />
+        </>
+      )}
 
       <style>{`
         #mob-btn{ display:none }
